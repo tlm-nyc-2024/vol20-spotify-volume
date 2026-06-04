@@ -8,6 +8,9 @@
 # --- macOS cruft ---
 .DS_Store
 
+# --- Personal cross-project guide (not part of this app) ---
+CLAUDE-GITHUB-GUIDE.md
+
 # --- Development screenshots / image captures ---
 *.jpg
 *.jpeg
