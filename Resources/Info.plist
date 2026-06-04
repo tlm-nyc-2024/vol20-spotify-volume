@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  Info.plist — metadata that tells macOS how to treat this app.
+
+  The single most important key for us is `LSUIElement = true` near the bottom.
+  That one boolean is what makes this a "menu-bar / agent app":
+    - no Dock icon
+    - no Cmd-Tab presence
+    - no main window unless we explicitly open one
+  Without it, the app would behave like a regular foreground app.
+
+  CFBundleIdentifier is the app's reverse-DNS unique ID — used by macOS for
+  permissions (TCC), preferences, login items, etc. Once chosen, don't change
+  it casually; macOS keys a lot of state off it.
+-->
+<plist version="1.0">
+<dict>
+    <key>CFBundleDevelopmentRegion</key>
+    <string>en</string>
+
+    <key>CFBundleExecutable</key>
+    <string>Vol20v2</string>
+
+    <key>CFBundleIdentifier</key>
+    <string>com.tlmattson.vol20v2</string>
+
+    <key>CFBundleInfoDictionaryVersion</key>
+    <string>6.0</string>
+
+    <key>CFBundleName</key>
+    <string>Vol20 v2.0</string>
+
+    <key>CFBundleDisplayName</key>
+    <string>Vol20 v2.0</string>
+
+    <key>CFBundlePackageType</key>
+    <string>APPL</string>
+
+    <key>CFBundleShortVersionString</key>
+    <string>2.0.0</string>
+
+    <key>CFBundleVersion</key>
+    <string>1</string>
+
+    <key>LSMinimumSystemVersion</key>
+    <string>14.0</string>
+
+    <!-- The magic key: makes this an agent (menu-bar) app, not a regular app. -->
+    <key>LSUIElement</key>
+    <true/>
+
+    <!-- Phase 1 will need this — the user-facing reason string shown by macOS
+         when the app first asks for Input Monitoring permission. Left here
+         now so we don't have to remember to add it later.                  -->
+    <key>NSInputMonitoringUsageDescription</key>
+    <string>Vol20 listens to your Fosi VOL20 knob so it can control Spotify's volume on your active speaker.</string>
+</dict>
+</plist>

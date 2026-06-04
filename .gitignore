@@ -1,0 +1,24 @@
+# --- Swift Package Manager build output ---
+.build/
+.swiftpm/
+
+# --- Built app bundle (produced by Scripts/build-app.sh) ---
+*.app/
+
+# --- macOS cruft ---
+.DS_Store
+
+# --- Development screenshots / image captures ---
+*.jpg
+*.jpeg
+*.png
+
+# --- Secrets & tokens: NEVER commit these ---
+# The app stores OAuth tokens outside the repo (Application Support),
+# but these patterns are a defensive backstop so a stray token file or
+# secret-bearing config can never be added by accident.
+*.spotify_token_cache
+*token*cache*
+tokens.json
+secrets.json
+*.secret
