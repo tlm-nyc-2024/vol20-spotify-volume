@@ -101,6 +101,12 @@ open source.
 
 ---
 
+## Support
+
+This is free and open source. If it's useful to you and you'd like to say
+thanks, you can [**buy me a coffee** ☕](https://www.buymeacoffee.com/tlmnyc2024).
+No pressure — a star on the repo is appreciated just as much.
+
 ## License
 
 [MIT](LICENSE) © 2026 Todd Mattson
