@@ -212,6 +212,17 @@ final class HIDListener {
         HIDRemap.suppressVolumeKeys()
         log("[HID] Re-applied volume-key suppression for \(name)")
 
+        // The apply above can silently miss. `hidutil --set` reports success
+        // even when no live device received the mapping, and during a
+        // forget/re-pair or wake-from-sleep the knob re-enumerates several
+        // times — an apply that runs mid-churn lands on an instance that's
+        // already gone, leaving the SETTLED instance uncovered (system
+        // volume couples back to Spotify). Because hidutil matches by vendor
+        // ID, a re-apply a few seconds later automatically hits whatever
+        // instance is connected then. So we verify the mapping actually
+        // took and retry until it does (or we exhaust attempts).
+        scheduleSuppressionReassert(attemptsLeft: 5, delay: 1.5)
+
         // --- Open the device explicitly --------------------------------
         // Manager-level open should propagate to matched devices, but in
         // practice for BLE consumer HID we've observed that values never
@@ -263,6 +274,35 @@ final class HIDListener {
             selfPtr
         )
         log("[HID] Per-device input-REPORT callback registered for \(name)")
+    }
+
+    // -------------------------------------------------------------------
+    // scheduleSuppressionReassert — verify the volume-key suppression
+    // actually landed, and re-apply if not.
+    //
+    // Runs on the main run loop (where IOKit delivers our callbacks). It
+    // waits `delay`, reads the mapping back via HIDRemap.suppressionActive(),
+    // and:
+    //   - if active  → done, stop.
+    //   - if not yet → re-apply and schedule one more attempt.
+    // Stops after `attemptsLeft` tries so it can't loop forever (e.g. when
+    // the knob is asleep and no device matches — coupling is moot then).
+    // -------------------------------------------------------------------
+    private func scheduleSuppressionReassert(attemptsLeft: Int, delay: TimeInterval) {
+        guard attemptsLeft > 0 else {
+            log("[HID] Suppression reassert: gave up after retries")
+            return
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + delay) { [weak self] in
+            guard let self else { return }
+            if HIDRemap.suppressionActive() {
+                self.log("[HID] Suppression verified active")
+                return
+            }
+            self.log("[HID] Suppression not active yet — re-applying (\(attemptsLeft) attempts left)")
+            HIDRemap.suppressVolumeKeys()
+            self.scheduleSuppressionReassert(attemptsLeft: attemptsLeft - 1, delay: delay)
+        }
     }
 
     private func deviceRemoved(_ device: IOHIDDevice) {

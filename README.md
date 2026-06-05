@@ -80,8 +80,45 @@ and calls the Spotify Web API only when you turn the knob, so it costs
 - The menu-bar dial icon flashes on each detent as activity feedback.
 - Optionally pin a specific device by name, and enable **Launch at login**
   from the menu.
-- **Wired tip:** if Bluetooth ever gets flaky, plug the knob in over USB —
-  the app recognizes it on the wire too, with no reconnection headaches.
+
+---
+
+## Connection notes — USB vs Bluetooth (read this)
+
+The VOL20 works **both** wired (USB) and over Bluetooth, and the app supports
+both. In real-world daily use, here's how they actually behave:
+
+### ✅ Recommended: keep it plugged in over USB
+
+This is the most reliable setup, full stop. Over USB the knob:
+
+- **Survives Mac sleep/wake with zero fuss** — it stays connected straight
+  through (tested through a 90-minute sleep: same session, no reconnect, no
+  re-pair, kept working instantly on wake).
+- Never needs re-pairing, and the Mac's system volume stays decoupled the
+  whole time.
+
+If the knob lives near your Mac, just leave it on the cable. Bluetooth then
+becomes a nice-to-have for when you want it cordless.
+
+### ⚠️ Bluetooth: works, but has a macOS quirk after sleep
+
+Over Bluetooth-LE the knob is great while connected, but when the **Mac goes
+to sleep** the knob's BLE link can drop into a wedged state. On wake you may
+find it shows in System Settings → Bluetooth with **no "Connect" button** —
+the tell-tale sign of a stale bond. The reliable recovery is:
+
+1. Click the **ⓘ** next to VOL20 → **Forget This Device**.
+2. Power-cycle the knob (off, then on).
+3. Re-pair it from the Bluetooth list.
+
+This is a **Bluetooth-stack quirk in macOS**, below the app — not something
+the app can prevent. What the app *does* handle: it automatically re-detects
+the knob on every (re)connect and **re-asserts the system-volume decoupling**,
+verifying it actually took and retrying if needed — so you won't get the
+"knob controls both Spotify *and* Mac volume" coupling after a reconnect.
+
+**Bottom line:** for set-and-forget reliability, **use it wired.**
 
 ---
 

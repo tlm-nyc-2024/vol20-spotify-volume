@@ -83,6 +83,24 @@ enum HIDRemap {
         }
     }
 
+    /// True if our volume-key suppression is currently active on at least
+    /// one of the VOL20's identities.
+    ///
+    /// This exists because `hidutil … --set` returns SUCCESS even when no
+    /// matching device was present to receive the mapping — so "apply OK"
+    /// is NOT proof the suppression landed. During a forget/re-pair or a
+    /// wake-from-sleep the knob re-enumerates several times, and an apply
+    /// that runs mid-churn can land on an instance that's already gone.
+    /// We read the mapping back to know whether it really took.
+    static func suppressionActive() -> Bool {
+        for matching in matchings {
+            let out = capture(arguments: ["property", "--matching", matching,
+                                          "--get", "UserKeyMapping"]) ?? ""
+            if out.contains("HIDKeyboardModifierMappingSrc") { return true }
+        }
+        return false
+    }
+
     /// Clear the remap on both identities — Mac's system volume keys for
     /// the knob work normally again. Called on graceful quit.
     static func restoreVolumeKeys() {
@@ -100,6 +118,33 @@ enum HIDRemap {
     // stderr so any failure ends up in our unified log instead of
     // disappearing into the void.
     // ---------------------------------------------------------------
+    // ---------------------------------------------------------------
+    // capture(arguments:)
+    //
+    // Like run(), but RETURNS hidutil's combined stdout/stderr text (or
+    // nil on launch failure) instead of just logging it. Used by
+    // suppressionActive() to read the current UserKeyMapping back.
+    // ---------------------------------------------------------------
+    private static func capture(arguments: [String]) -> String? {
+        let task = Process()
+        task.executableURL = URL(fileURLWithPath: "/usr/bin/hidutil")
+        task.arguments = arguments
+
+        let pipe = Pipe()
+        task.standardOutput = pipe
+        task.standardError = pipe
+
+        do {
+            try task.run()
+            task.waitUntilExit()
+            let data = (try? pipe.fileHandleForReading.readToEnd()) ?? Data()
+            return String(data: data, encoding: .utf8)
+        } catch {
+            logger.error("hidutil capture failed: \(error.localizedDescription, privacy: .public)")
+            return nil
+        }
+    }
+
     private static func run(arguments: [String], action: String) {
         let task = Process()
         task.executableURL = URL(fileURLWithPath: "/usr/bin/hidutil")
