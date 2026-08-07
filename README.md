@@ -122,6 +122,17 @@ verifying it actually took and retrying if needed — so you won't get the
 
 ---
 
+## Troubleshooting
+
+If the knob stops doing anything (0 detents), see **[TROUBLESHOOTING.md](TROUBLESHOOTING.md)**.
+The two known real-world causes: a keyboard-remapping tool (e.g.
+Karabiner-Elements) seizing the knob's HID interface, and a **stale Input
+Monitoring grant** — macOS point updates can silently kill delivery while
+still reporting "granted," and every ad-hoc rebuild invalidates the grant
+(`tccutil reset ListenEvent com.tlmattson.vol20v2`, relaunch, re-grant).
+
+---
+
 ## Roadmap
 
 - **v3** — play/pause and next-track from the knob's button (macOS routes

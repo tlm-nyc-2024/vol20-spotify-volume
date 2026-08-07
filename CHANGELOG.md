@@ -3,6 +3,17 @@
 All notable changes to this project are documented here.
 This project adheres to [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Docs
+- **TROUBLESHOOTING.md added** after a 2026-08-07 field incident (knob dead,
+  0 detents). Two independent environmental causes: Karabiner-Elements
+  seizing the knob's keyboard-class HID interface (fixed with permanent
+  `ignore` entries in the Karabiner config), and a stale Input Monitoring
+  (TCC) grant after a macOS 15.7.x point update — plus the corollary that
+  every ad-hoc rebuild invalidates the existing grant. No code changes;
+  the v2.0.1 code was and remains correct.
+
 ## [2.0.1] — 2026-06-04
 
 ### Fixed
