@@ -8,8 +8,11 @@ It's **event-driven**: it listens for the knob's HID volume events via IOKit
 and calls the Spotify Web API only when you turn the knob, so it costs
 ~0% CPU while idle.
 
-> **Scope:** this release (v2.5) is **volume only**. Play/pause and
-> next-track from the knob's button are planned for a future version.
+> **Scope:** this app handles **volume**. The knob's **play/pause button
+> already works** without any help from this app: pressing it sends a
+> standard media-key event, which macOS routes to your current media app —
+> with Spotify running, it plays and pauses Spotify as you'd expect.
+> Richer button handling (e.g. next-track) may come in a future version.
 
 **New in v2.5:** the knob **follows the active Spotify Connect device** —
 whatever you pick in Spotify's device menu (computer speakers, AirPlay, a
@@ -92,6 +95,8 @@ CHANGELOG.md.)
 ## Usage
 
 - Turn the knob → the active Spotify Connect device's volume changes.
+- Press the knob's button → play/pause. (Handled natively by macOS media-key
+  routing, not by this app — it just works with Spotify running.)
 - Pick the target the way you always do — Spotify's Connect device menu.
   The knob follows whatever is active; there's nothing to configure.
 - The menu-bar dial icon flashes on each detent as activity feedback.
@@ -155,9 +160,11 @@ still reporting "granted," and every ad-hoc rebuild invalidates the grant
 
 ## Roadmap
 
-- **v3** — play/pause and next-track from the knob's button (macOS routes
-  those media keys to the system media app today; capturing them cleanly is
-  a separate, messier problem, deliberately deferred).
+- **v3 (maybe)** — richer button handling, e.g. next-track. Play/pause
+  already works today via macOS's native media-key routing (see Usage), so
+  v3 would only add value beyond that — capturing the button's media keys
+  cleanly is a separate, messier problem, deliberately deferred until it's
+  worth it.
 
 ---
 
