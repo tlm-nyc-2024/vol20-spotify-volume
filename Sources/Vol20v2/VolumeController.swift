@@ -182,22 +182,23 @@ final class VolumeController {
 
     // MARK: - Device & volume resolution
 
-    /// First call: list devices, find by preferred name, cache id.
-    /// Subsequent calls: return cached id.
+    /// CHANGED 2026-08-16 (TLM-directed): follow the ACTIVE device.
+    ///
+    /// Previous behavior (v2.0.x): list devices, pin
+    /// `SpotifyConfig.preferredDeviceName` ("LSX II-Office") by ID, and
+    /// target it for every write even when playback was on another
+    /// device — which made the knob appear dead whenever playback
+    /// wandered off the KEF (writes landed on an idle speaker).
+    ///
+    /// New behavior: always return nil. `setVolume(_, deviceID: nil)`
+    /// omits `device_id`, so Spotify targets whatever device is
+    /// currently active — the knob follows playback. Trade-off, accepted
+    /// by TLM: if NOTHING is actively playing anywhere, volume writes
+    /// fail (surfaced as an error status) instead of adjusting the idle
+    /// KEF. The old pinning code is preserved in git history (v2.0.1,
+    /// commit 039f3e6); `pinnedDeviceID`/`pinnedDeviceName` now stay nil
+    /// so the status line reads "Active device → N%".
     private func resolveDeviceID() async throws -> String? {
-        if let id = pinnedDeviceID { return id }
-
-        let devices = try await spotify.listDevices()
-        if let match = devices.first(where: { $0.name == SpotifyConfig.preferredDeviceName }) {
-            pinnedDeviceID = match.id
-            pinnedDeviceName = match.name
-            Self.logger.notice("Pinned preferred device: \(match.name, privacy: .public)")
-            return match.id
-        }
-
-        // Preferred device not in the list right now — fall back to
-        // "active device" (nil device_id), which Spotify will resolve.
-        Self.logger.notice("Preferred device '\(SpotifyConfig.preferredDeviceName, privacy: .public)' not found; falling back to active device")
         return nil
     }
 

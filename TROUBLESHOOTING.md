@@ -113,3 +113,22 @@ not, unplug/replug the knob (the app re-applies on every device match).
 Known macOS issue, not the app: after sleep the BLE pairing can wedge and need
 a forget/re-pair. **Wired USB is the recommended transport** — it survives
 sleep/wake seamlessly (see README).
+
+## Bluetooth bond lost after USB use — 2026-08-16 (OPEN)
+
+Observed by TLM: once the knob has been used over USB, unplugging the cable
+does NOT bring it back over Bluetooth — even though the Mac still lists the
+VOL20 as paired. The Mac must **Forget This Device** and pair fresh every
+time (battery confirmed alive: LED lights when unplugged). This matches
+Fosi's documented failure shape ("if you select the VOL20 from a previously
+connected device's Bluetooth menu, it won't connect — your device has stored
+the pairing, but the VOL20 hasn't"): the knob appears to drop its side of
+the bond, possibly whenever USB mode takes over. The app is not involved —
+it matches the BLE identity (0x07d7) fine once macOS delivers the device
+(verified working after a fresh pair, 2026-08-16).
+
+Status: OPEN — TLM researching (firmware behavior / possible Fosi support
+question). Workaround: leave the knob wired; USB takes priority when
+plugged. Note for any future fix attempt: after ANY re-pair, the app
+re-applies volume-key suppression automatically (v2.0.1 self-heal), and
+Karabiner's ignore rule already covers the BLE identity.

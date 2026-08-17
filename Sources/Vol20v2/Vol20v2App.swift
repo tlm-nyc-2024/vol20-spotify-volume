@@ -225,6 +225,25 @@ private struct MenuPanel: View {
     /// Persists per-detent step size across app launches.
     @AppStorage("vol20.stepSize") private var stepSize: Int = AppState.defaultStepSize
 
+    /// UI simplification 2026-08-16 (TLM-directed): the everyday view is
+    /// minimal; the full troubleshooting screen (the one used in the
+    /// 2026-08-07/08-16 debugging sessions) is preserved VERBATIM below,
+    /// one click away behind this toggle. Persisted so it stays put
+    /// across launches.
+    @AppStorage("vol20.showDiagnostics") private var showDiagnostics: Bool = false
+
+    /// The target device is chosen in Spotify (Connect picker), so the
+    /// everyday view shows just the volume percentage — no device name.
+    /// Descriptions look like "Active device → 54%" or
+    /// "LSX II-Office (idle)  •  52%"; keep only the part after the
+    /// arrow/bullet.
+    private var volumePercentOnly: String {
+        let d = state.lastWrittenDescription
+        guard d != "—" else { return "—" }
+        let parts = d.components(separatedBy: CharacterSet(charactersIn: "→•"))
+        return (parts.last ?? d).trimmingCharacters(in: .whitespaces)
+    }
+
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
 
@@ -232,7 +251,7 @@ private struct MenuPanel: View {
             HStack {
                 Image(systemName: "dial.medium")
                     .font(.title2)
-                Text("Vol20 v2.0")
+                Text("Vol20 v2.5")
                     .font(.title2)
                     .fontWeight(.semibold)
                 Spacer()
@@ -240,19 +259,29 @@ private struct MenuPanel: View {
 
             Divider()
 
-            // --- "Now" — what's playing where ---
+            // --- Volume — percent only; the device is Spotify's business ---
+            // Transient status ("applying +3%…", "queued: +2", errors) sits
+            // on the SAME line, right-aligned, so the pane never changes
+            // shape while the knob turns (TLM-directed, 2026-08-16).
             if state.spotify.hasStoredCredentials {
-                Text("Now")
-                    .font(.headline)
-                Text(state.lastWrittenDescription)
-                    .font(.title3)
-                    .fontWeight(.medium)
-                    .monospacedDigit()
-
-                if state.volumeStatus != "idle" {
-                    Text("Volume: \(state.volumeStatus)")
-                        .font(.body)
+                HStack(alignment: .firstTextBaseline) {
+                    Text("Volume: \(volumePercentOnly)")
+                        .font(.title3)
+                        .fontWeight(.medium)
                         .monospacedDigit()
+                    Spacer()
+                    if state.volumeStatus != "idle",
+                       !state.volumeStatus.hasPrefix("Active device"),
+                       !state.volumeStatus.contains("→") {
+                        // Transient/apply/error states only — successful
+                        // writes are already reflected in the percent.
+                        Text(state.volumeStatus)
+                            .font(.body)
+                            .monospacedDigit()
+                            .lineLimit(1)
+                            .truncationMode(.middle)
+                            .foregroundStyle(.secondary)
+                    }
                 }
             } else {
                 Text("Not signed in to Spotify")
@@ -292,24 +321,7 @@ private struct MenuPanel: View {
                     .foregroundStyle(.red)
             }
 
-            Divider()
-
-            // --- Diagnostics block (inline, readable) ---
-            Text("Diagnostics")
-                .font(.headline)
-
-            VStack(alignment: .leading, spacing: 4) {
-                LabeledLine("HID",       state.hidStatus)
-                LabeledLine("Detents",   "\(state.detentCount)")
-                LabeledLine("Volume",    state.volumeStatus)
-                LabeledLine("Spotify",   state.spotifyStatus)
-                LabeledLine("KEF read",  state.lastKEFVolume)
-                LabeledLine("Login item", state.loginItem.rawStatusDescription)
-            }
-
             HStack(spacing: 8) {
-                Button("🔍 Read KEF") { state.readKEFVolume() }
-                    .disabled(state.isWorking || !state.spotify.hasStoredCredentials)
                 Button("Re-auth") { state.authenticateWithSpotify() }
                     .disabled(state.isWorking)
                 if state.spotify.hasStoredCredentials {
@@ -320,7 +332,33 @@ private struct MenuPanel: View {
 
             Divider()
 
-            Button("Quit Vol20 v2.0") {
+            // --- Diagnostics: hidden by default (2026-08-16) --------------
+            // This is the FULL troubleshooting screen from v2.0.x, kept
+            // verbatim for future debugging (see TROUBLESHOOTING.md for the
+            // sessions that relied on it). Toggle to reveal.
+            Toggle("Show diagnostics", isOn: $showDiagnostics)
+                .font(.body)
+
+            if showDiagnostics {
+                Text("Diagnostics")
+                    .font(.headline)
+
+                VStack(alignment: .leading, spacing: 4) {
+                    LabeledLine("HID",       state.hidStatus)
+                    LabeledLine("Detents",   "\(state.detentCount)")
+                    LabeledLine("Volume",    state.volumeStatus)
+                    LabeledLine("Spotify",   state.spotifyStatus)
+                    LabeledLine("KEF read",  state.lastKEFVolume)
+                    LabeledLine("Login item", state.loginItem.rawStatusDescription)
+                }
+
+                Button("🔍 Read KEF") { state.readKEFVolume() }
+                    .disabled(state.isWorking || !state.spotify.hasStoredCredentials)
+            }
+
+            Divider()
+
+            Button("Quit Vol20 v2.5") {
                 NSApplication.shared.terminate(nil)
             }
             .keyboardShortcut("q")
