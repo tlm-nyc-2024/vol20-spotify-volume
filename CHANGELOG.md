@@ -7,13 +7,13 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 - **The knob now follows the ACTIVE Spotify Connect device** instead of
-  pinning "LSX II-Office" (TLM-directed). `VolumeController.resolveDeviceID()`
+  pinning "LSX II-Office" (by owner request). `VolumeController.resolveDeviceID()`
   returns nil, so volume PUTs omit `device_id` and Spotify targets whatever
   is playing — Mac speakers, AirPlay, the KEF, anything. Trade-off: with
   nothing actively playing anywhere, writes fail (shown as an error status)
   instead of silently adjusting an idle speaker. Old pinning code preserved
   in git history (v2.0.1).
-- **Simplified everyday menu panel** (TLM-directed): Volume percent only
+- **Simplified everyday menu panel** (by owner request): Volume percent only
   (no device name — the Spotify Connect picker owns targeting), step size,
   Launch at login, Re-auth/Sign out, Quit. Transient status ("applying
   +3%…", errors) renders right-aligned ON the Volume line so the panel
@@ -37,7 +37,7 @@ This project adheres to [Semantic Versioning](https://semver.org/).
   the knob has been used over USB, unplugging it does NOT auto-reconnect
   over BT; the Mac must Forget the device and re-pair from scratch each
   time (the knob appears to drop its side of the stored bond). Workaround:
-  leave it wired (USB always takes priority when plugged). TLM researching
+  leave it wired (USB always takes priority when plugged). Being researched
   separately.
 
 ## [2.0.1] — 2026-06-04
@@ -84,5 +84,6 @@ First public release. Volume control only.
 - This release is **volume only**; play/pause and next-track from the knob's
   button are planned for v3.
 
+[2.5.0]: https://github.com/tlm-nyc-2024/vol20-spotify-volume/releases/tag/v2.5.0
 [2.0.1]: https://github.com/tlm-nyc-2024/vol20-spotify-volume/releases/tag/v2.0.1
 [2.0.0]: https://github.com/tlm-nyc-2024/vol20-spotify-volume/releases/tag/v2.0.0

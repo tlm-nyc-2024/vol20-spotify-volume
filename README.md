@@ -8,8 +8,15 @@ It's **event-driven**: it listens for the knob's HID volume events via IOKit
 and calls the Spotify Web API only when you turn the knob, so it costs
 ~0% CPU while idle.
 
-> **Scope:** this release (v2.0) is **volume only**. Play/pause and
+> **Scope:** this release (v2.5) is **volume only**. Play/pause and
 > next-track from the knob's button are planned for a future version.
+
+**New in v2.5:** the knob **follows the active Spotify Connect device** —
+whatever you pick in Spotify's device menu (computer speakers, AirPlay, a
+wireless speaker) is what the knob controls, with no configuration. The menu
+panel is also simpler: just the volume, with the full diagnostics screen one
+"Show diagnostics" click away. (v2.0 pinned one named speaker; see
+CHANGELOG.md.)
 
 ---
 
@@ -19,18 +26,25 @@ and calls the Spotify Web API only when you turn the knob, so it costs
   detent (turn of the knob). The knob is recognized on **either** transport:
   Bluetooth-LE *or* a wired USB connection (it presents a different
   vendor/product ID on each, and the app matches both).
-- **Volume control** — on each turn it reads the target device's *actual*
+- **Volume control** — on each turn it reads the *active* device's actual
   current volume from Spotify, applies the accumulated delta, and writes it
   back (read-before-write, so it never drifts). Turns are debounced so a fast
-  spin results in one API call.
+  spin results in one API call. The target is always whatever device is
+  currently active in Spotify Connect — switch devices in Spotify and the
+  knob follows automatically. (If nothing is actively playing anywhere,
+  there's no active device and volume writes report an error until playback
+  resumes.)
 - **System-volume decoupling** — macOS normally routes the knob's volume keys
   to the Mac's own speaker volume. The app uses `hidutil` to remap those keys
   to "no action" for the VOL20 specifically, so turning the knob moves *only*
   the Spotify device — your Mac's system volume stays put. (Other devices'
   volume keys are unaffected.)
-- **Menu bar** — a `MenuBarExtra` shows status, the active device, and a
-  subtle icon "flash" on each detent so you get live feedback that events are
-  being received. It can run at login.
+- **Menu bar** — a `MenuBarExtra` panel shows the current volume (with any
+  in-flight change on the same line), a step-size stepper, and Launch at
+  login. The icon "flashes" subtly on each detent so you get live feedback
+  that events are being received. A **Show diagnostics** toggle reveals the
+  full status screen (HID state, detent counter, API status, a device-volume
+  probe) when you need to troubleshoot.
 
 ---
 
@@ -77,9 +91,14 @@ and calls the Spotify Web API only when you turn the knob, so it costs
 ## Usage
 
 - Turn the knob → the active Spotify Connect device's volume changes.
+- Pick the target the way you always do — Spotify's Connect device menu.
+  The knob follows whatever is active; there's nothing to configure.
 - The menu-bar dial icon flashes on each detent as activity feedback.
-- Optionally pin a specific device by name, and enable **Launch at login**
-  from the menu.
+- Set the per-detent step size and enable **Launch at login** from the menu.
+- Flip **Show diagnostics** in the menu if something seems off — a climbing
+  detent counter with failing writes means a Spotify/playback problem, while
+  a stuck-at-zero counter means the knob's events aren't reaching the app
+  (see TROUBLESHOOTING.md).
 
 ---
 

@@ -40,8 +40,8 @@ now carries `ignore: true` device entries for both knob identities
 in the selected profile. Karabiner hot-reloads the file on save. Pre-change
 backup: `~/.config/karabiner/karabiner.json.bak-2026-08-07`.
 
-Do NOT remove those entries. They only exclude the knob; the Lenovo-keyboard
-device entry and the ⇧⌘B Drafts-capture complex modification are untouched.
+Do NOT remove those entries. They only exclude the knob; any other keyboard
+device entries and existing complex-modification rules are untouched.
 
 ### Cause 2: stale Input Monitoring (TCC) grant
 
@@ -116,7 +116,7 @@ sleep/wake seamlessly (see README).
 
 ## Bluetooth bond lost after USB use — 2026-08-16 (OPEN)
 
-Observed by TLM: once the knob has been used over USB, unplugging the cable
+Observed in daily use: once the knob has been used over USB, unplugging the cable
 does NOT bring it back over Bluetooth — even though the Mac still lists the
 VOL20 as paired. The Mac must **Forget This Device** and pair fresh every
 time (battery confirmed alive: LED lights when unplugged). This matches
@@ -127,7 +127,7 @@ the bond, possibly whenever USB mode takes over. The app is not involved —
 it matches the BLE identity (0x07d7) fine once macOS delivers the device
 (verified working after a fresh pair, 2026-08-16).
 
-Status: OPEN — TLM researching (firmware behavior / possible Fosi support
+Status: OPEN — researching (firmware behavior / possible Fosi support
 question). Workaround: leave the knob wired; USB takes priority when
 plugged. Note for any future fix attempt: after ANY re-pair, the app
 re-applies volume-key suppression automatically (v2.0.1 self-heal), and
