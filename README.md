@@ -23,7 +23,8 @@ CHANGELOG.md.)
 ## How it works
 
 - **HID listener** — an `IOHIDManager` matches the VOL20 and fires on each
-  detent (turn of the knob). The knob is recognized on **either** transport:
+  detent — one click, or haptic notch, of the knob's rotation, so a single
+  turn produces a burst of detents. The knob is recognized on **either** transport:
   Bluetooth-LE *or* a wired USB connection (it presents a different
   vendor/product ID on each, and the app matches both).
 - **Volume control** — on each turn it reads the *active* device's actual
